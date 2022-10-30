@@ -6,6 +6,7 @@ import cv2
 import os
 
 IMG_EXTENSION = "png"
+RENDERED_SIZE = 256
 
 def main():
     parser = argparse.ArgumentParser(description='This script generates tile images from a large image.')
@@ -26,7 +27,8 @@ def save_splitted_image(img, depth, base_outdir, height, width):
     if depth == 0:
         outdir = os.path.join(base_outdir, "0", "0")
         os.makedirs(outdir, exist_ok=True)
-        cv2.imwrite(os.path.join(outdir, f"0.{IMG_EXTENSION}"), img)
+        # cv2.imwrite(os.path.join(outdir, f"0.{IMG_EXTENSION}"), img)
+        save_image(os.path.join(outdir, f"0.{IMG_EXTENSION}"), img)
         return
 
     n_split = 2 ** depth
@@ -39,11 +41,16 @@ def save_splitted_image(img, depth, base_outdir, height, width):
 
         for y in range(n_split):
             splitted_img = img[cy:cy+int(height/n_split), cx:cx+int(width/n_split), :]
-            cv2.imwrite(os.path.join(outdir, f"{y}.{IMG_EXTENSION}"), splitted_img)
+            # cv2.imwrite(os.path.join(outdir, f"{y}.{IMG_EXTENSION}"), splitted_img)
+            save_image(os.path.join(outdir, f"{y}.{IMG_EXTENSION}"), splitted_img)
             cy = cy + int(height/n_split)
         cy=0
         cx=cx+int(width/n_split)
 
+
+def save_image(path: str, image):
+    resized_image = cv2.resize(image, dsize=(RENDERED_SIZE, RENDERED_SIZE))
+    cv2.imwrite(path, resized_image)
 
 if __name__ == '__main__':
     main()
